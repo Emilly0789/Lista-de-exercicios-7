@@ -34,4 +34,22 @@ Para que um objeto possa ser utilizado dentro de um try-with-resources, sua clas
 1. java.lang.AutoCloseable: É a interface raiz criada especificamente para esse recurso. Qualquer classe que a implemente pode ser usada no bloco. Seu método close() lança Exception genérica.
 2. java.io.Closeable: É uma subinterface que estende AutoCloseable. Foi mantida por retrocompatibilidade com classes de entrada/saída (I/O) mais antigas. Seu método close() lança especificamente IOException.
 
-Questão 3:
+Questão 3: O recurso de multi-catch (introduzido no Java 7) permite capturar múltiplos tipos de exceções em um único bloco catch, separando-os pelo operador pipe (|), o que elimina a duplicação de código quando o tratamento é idêntico.
+
+Exemplo de sintaxe
+
+java
+try {
+    // Código que pode lançar IOException ou SQLException
+} catch (IOException | SQLException ex) {
+    // Tratamento unificado para ambas as exceções
+    logger.log(ex);
+}
+Use o código com cuidado.
+
+Principais cuidados ao utilizar
+
+O cuidado mais importante envolve a hierarquia de herança entre as exceções:
+• Proibição de relação pai-filho: As exceções listadas no mesmo bloco catch não podem ter relação de herança entre si (superclasse e subclasse). Por exemplo, catch (IOException | Exception ex) gera um erro de compilação, pois IOException já é filha de Exception e a captura da classe mais específica seria redundante.
+• Variável implicitamente final: A variável que recebe a exceção (como ex no exemplo acima) é considerada implicitamente final. Você não pode reatribuir um novo objeto a ela dentro do bloco catch.
+• Tipo da variável capturada: Em tempo de compilação, o tipo da variável será a superclasse comum mais próxima entre as exceções listadas (muitas vezes Exception ou Throwable), limitando os métodos específicos que você pode chamar diretamente sem fazer um cast.
